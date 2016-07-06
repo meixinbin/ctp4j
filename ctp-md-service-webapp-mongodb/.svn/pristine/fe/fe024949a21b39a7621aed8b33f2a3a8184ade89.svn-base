@@ -1,0 +1,60 @@
+package com.itqy8.data.entity;
+
+import java.io.Serializable;
+
+public class MAData implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3253267142191776354L;
+
+	/**合约代码*/
+	private String instrumentId;
+	
+	/**指标值*/
+	private Double maPrice;
+	
+	/**
+	 * 输入数据
+	 */
+	private double[] inData;
+
+	
+	/**指标时间*/
+	private Long priceTime;
+
+	public String getInstrumentId() {
+		return instrumentId;
+	}
+
+	public void setInstrumentId(String instrumentId) {
+		this.instrumentId = instrumentId;
+	}
+
+	public Double getMaPrice() {
+		return maPrice;
+	}
+
+	public void setMaPrice(Double maPrice) {
+		this.maPrice = maPrice;
+	}
+
+	public Long getPriceTime() {
+		return priceTime;
+	}
+
+	public void setPriceTime(Long priceTime) {
+		this.priceTime = priceTime;
+	}
+
+	public double[] getInData() {
+		return inData;
+	}
+
+	public void setInData(double[] inData) {
+		this.inData = inData;
+	}
+	
+	
+}

@@ -1,0 +1,17 @@
+package com.itqy8.ctp.md.dao;
+
+import java.util.List;
+
+import com.itqy8.ctp.md.entity.MarketData;
+import com.itqy8.framework.dao.BaseDao;
+
+/**
+ * 
+ * @author meixinbin
+ * @version 1.0
+ */
+public interface MarketDataDao extends BaseDao{
+
+	public List<MarketData> getMarketData30s(String instrumentID);
+	public List<MarketData> getMarketData(String instrumentID,long start,long end);
+}

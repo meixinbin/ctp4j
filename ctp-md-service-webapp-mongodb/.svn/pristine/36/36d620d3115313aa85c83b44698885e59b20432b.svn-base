@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="com.itqy8.ctp.md.entity">
+
+	<class name="MarketData30s" table="tb_market_data_30s">
+	
+		<comment>30秒期权实时信息表</comment>
+		
+	    <id name="id" type="long" length="20">
+	    	<column name="id">
+	    		<comment>主键</comment>
+	    	</column>
+			<generator class="native" />
+		</id>
+		<property name="preClosePrice" type="double">
+			<column name="pre_close_price">
+				<comment>昨收盘</comment>
+			</column>
+		</property>
+		<property name="openPrice" type="double">
+			<column name="open_price">
+				<comment>开盘价</comment>
+			</column>
+		</property>
+		<property name="lastPrice" type="double">
+			<column name="last_price">
+				<comment>当前价格</comment>
+			</column>
+		</property>
+		<property name="highestPrice" type="double">
+			<column name="highest_price">
+				<comment>最高价</comment>
+			</column>
+		</property>
+		<property name="lowestPrice" type="double">
+			<column name="lowest_price">
+				<comment>最低价</comment>
+			</column>
+		</property>
+		<property name="priceTime" type="long">
+			<column name="price_time">
+				<comment>当前价格时间</comment>
+			</column>
+		</property>
+		
+		<property name="instrumentId" type="string">
+			<column name="instrument_id">
+				<comment>合约代码</comment>
+			</column>
+		</property>
+		
+		
+	</class>
+
+</hibernate-mapping>

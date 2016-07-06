@@ -1,0 +1,8 @@
+#========================#
+#  meixinbin			 #
+# dubbo config		 #
+#========================#
+
+dubbo.application.name=yearbook-service-provider
+dubbo.port=7008
+dubbo.zookeeper.url=zookeeper://127.0.0.1:2181

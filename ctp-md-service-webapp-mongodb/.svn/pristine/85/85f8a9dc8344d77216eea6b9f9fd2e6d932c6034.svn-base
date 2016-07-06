@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+<bean id="marketService" class="com.itqy8.ctp.md.service.MarketServiceImpl"> 
+  <property name="marketDataDao" ref="marketDataDao" /> 
+  <property name="oHLCDataService" ref="oHLCDataService" /> 
+ </bean> 
+ 
+ <bean id="oHLCDataService" class="com.ctp.data.service.OHLCDataServiceImpl">
+ 	<property name="oHLCDataDao" ref="oHLCDataDao"/>
+ 	<property name="marketDataDao" ref="marketDataDao"/>
+ </bean>
+</beans>

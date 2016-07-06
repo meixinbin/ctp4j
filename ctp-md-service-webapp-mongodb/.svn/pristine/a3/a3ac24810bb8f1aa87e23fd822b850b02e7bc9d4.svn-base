@@ -1,0 +1,23 @@
+package com.ctp.data.service;
+
+import com.ctp.data.entity.MarketData;
+import com.ctp.data.entity.OHLCDataItem;
+
+public interface OHLCDataService {
+
+	public void addOHLCData30MS(MarketData data);
+	
+	
+	public <T extends OHLCDataItem> void  add(Class<T> clazz,String instrumentId,long now);
+	
+	
+	/**
+	 * 
+	 * @param instrumentId
+	 * @param timeUnits
+	 * @return
+	 * @author meixinbin 2016-6-2 下午2:16:02
+	 */
+	OHLCDataItem getLastOHLCData30MS(String instrumentId,long now,int timePeriod);
+	
+}

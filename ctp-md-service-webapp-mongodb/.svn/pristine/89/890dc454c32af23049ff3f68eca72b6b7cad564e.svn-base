@@ -1,0 +1,37 @@
+package com.ctp.dao;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
+import com.ctp.data.MarketData;
+
+
+public interface MarketDataDao{
+
+	/**
+	 * 向redis中 存储数据
+	 * 
+	 * @author meixinbin 2016-5-25 上午10:41:20
+	 */
+	public void save(MarketData marketData);
+	
+	
+	public void addZset(MarketData marketData);
+	
+	public Set<MarketData> getList(String instrumentId,long start,long end);
+	
+	/**
+	 * 根据id列表批量获取值
+	 * @param ids
+	 * @return
+	 * @author meixinbin 2016-5-26 上午10:00:35
+	 */
+	public List<Object> multiGet(Collection<Object> ids);
+	
+	
+	public MarketData get(String id);	
+	
+	
+	public Set<MarketData> getList(String instrumentId,long start, long end,int count);
+}

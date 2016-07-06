@@ -1,0 +1,158 @@
+package com.itqy8.ctp.md.service;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+
+import org.joda.time.DateTime;
+
+import com.ctp.dao.MarketDataDao;
+import com.ctp.data.MarketData;
+import com.ctp.data.OHLCDataItem;
+import com.ctp.data.service.OHLCDataService;
+import com.ctp.strategy.DoubleMAStrategy;
+import com.itqy8.ctp.CThostFtdcDepthMarketDataField;
+import com.itqy8.ctp.enums.TimeUnits;
+import com.itqy8.framework.response.VoidResponse;
+
+import eu.verdelhan.ta4j.Decimal;
+import eu.verdelhan.ta4j.Strategy;
+import eu.verdelhan.ta4j.Tick;
+import eu.verdelhan.ta4j.TimeSeries;
+import eu.verdelhan.ta4j.TradingRecord;
+import eu.verdelhan.ta4j.analysis.criteria.NumberOfTradesCriterion;
+import eu.verdelhan.ta4j.analysis.criteria.TotalProfitCriterion;
+
+public class MarketServiceImpl implements MarketService{
+
+	private MarketDataDao marketDataDao;
+	private OHLCDataService oHLCDataService;
+	private static double total = 100000.0d;
+	private static double volume = 0;
+	
+	@Override
+	public VoidResponse add(CThostFtdcDepthMarketDataField pDepthMarketData) {
+		MarketData md = new MarketData();
+        md.setAskPrice1(pDepthMarketData.getAskPrice1());
+        md.setAskPrice2(pDepthMarketData.getAskPrice2());
+        md.setAskPrice3(pDepthMarketData.getAskPrice3());
+        md.setAskPrice4(pDepthMarketData.getAskPrice4());
+        md.setAskPrice5(pDepthMarketData.getAskPrice5());
+        
+        md.setAskVolume1(pDepthMarketData.getAskVolume1());
+        md.setAskVolume2(pDepthMarketData.getAskVolume2());
+        md.setAskVolume3(pDepthMarketData.getAskVolume3());
+        md.setAskVolume4(pDepthMarketData.getAskVolume4());
+        md.setAskVolume5(pDepthMarketData.getAskVolume5());
+        
+        md.setBidPrice1(pDepthMarketData.getBidPrice1());
+        md.setBidPrice2(pDepthMarketData.getBidPrice2());
+        md.setBidPrice3(pDepthMarketData.getBidPrice3());
+        md.setBidPrice4(pDepthMarketData.getBidPrice4());
+        md.setBidPrice5(pDepthMarketData.getBidPrice5());
+        
+        md.setBidVolume1(pDepthMarketData.getBidVolume1());
+        md.setBidVolume2(pDepthMarketData.getBidVolume2());
+        md.setBidVolume3(pDepthMarketData.getBidVolume3());
+        md.setBidVolume4(pDepthMarketData.getBidVolume4());
+        md.setBidVolume5(pDepthMarketData.getBidVolume5());
+        
+        md.setCurrDelta(pDepthMarketData.getCurrDelta());
+        md.setClosePrice(pDepthMarketData.getClosePrice());
+        md.setExchangeID(pDepthMarketData.getExchangeID());
+        md.setExchangeInstID(pDepthMarketData.getExchangeInstID());
+        md.setHighestPrice(pDepthMarketData.getHighestPrice());
+        md.setInstrumentID(pDepthMarketData.getInstrumentID());
+        md.setLastPrice(pDepthMarketData.getLastPrice());
+        md.setLowerLimitPrice(pDepthMarketData.getLowerLimitPrice());
+        md.setLowestPrice(pDepthMarketData.getLowestPrice());
+        md.setOpenInterest(pDepthMarketData.getOpenInterest());
+        md.setOpenPrice(pDepthMarketData.getOpenPrice());
+        md.setPreClosePrice(pDepthMarketData.getPreClosePrice());
+        md.setPreDelta(pDepthMarketData.getPreDelta());
+        md.setPreOpenInterest(pDepthMarketData.getPreOpenInterest());
+        md.setPreSettlementPrice(pDepthMarketData.getPreSettlementPrice());
+        md.setTradingDay(pDepthMarketData.getTradingDay());
+        md.setTurnover(pDepthMarketData.getTurnover());
+        md.setUpdateMillisec(pDepthMarketData.getUpdateMillisec());
+        md.setUpdateTime(pDepthMarketData.getUpdateTime());
+        md.setVolume(pDepthMarketData.getVolume());
+        md.setUpperLimitPrice(pDepthMarketData.getUpperLimitPrice());
+        md.setAveragePrice(pDepthMarketData.getAveragePrice());
+        md.setActionDay(pDepthMarketData.getActionDay());
+        String dateStr = md.getTradingDay() + " " + md.getUpdateTime() +":"+ md.getUpdateMillisec();
+		try {
+			Date date = new SimpleDateFormat("yyyyMMdd HH:mm:ss:SSS").parse(dateStr);
+			md.setTradingDateTime(date.getTime());
+			this.marketDataDao.addZset(md);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		//30s
+		this.oHLCDataService.addMiniUnitOHLCDataItem(md.getInstrumentID(),md.getTradingDateTime());
+		//1m
+		this.oHLCDataService.addOHLCDataItem(md.getInstrumentID(),md.getTradingDateTime(), TimeUnits.TIME_1M, TimeUnits.TIME_30S);
+		this.oHLCDataService.addOHLCDataItem(md.getInstrumentID(),md.getTradingDateTime(), TimeUnits.TIME_5M, TimeUnits.TIME_1M);
+		this.oHLCDataService.addOHLCDataItem(md.getInstrumentID(),md.getTradingDateTime(), TimeUnits.TIME_10M, TimeUnits.TIME_5M);
+		this.oHLCDataService.addOHLCDataItem(md.getInstrumentID(),md.getTradingDateTime(), TimeUnits.TIME_15M, TimeUnits.TIME_5M);
+		this.oHLCDataService.addOHLCDataItem(md.getInstrumentID(),md.getTradingDateTime(), TimeUnits.TIME_30M, TimeUnits.TIME_15M);
+		this.oHLCDataService.addOHLCDataItem(md.getInstrumentID(),md.getTradingDateTime(), TimeUnits.TIME_1H, TimeUnits.TIME_30M);
+		this.oHLCDataService.addOHLCDataItem(md.getInstrumentID(),md.getTradingDateTime(), TimeUnits.TIME_1D, TimeUnits.TIME_1H);
+		this.oHLCDataService.addOHLCDataItem(md.getInstrumentID(),md.getTradingDateTime(), TimeUnits.TIME_5D, TimeUnits.TIME_1D);
+		this.oHLCDataService.addOHLCDataItem(md.getInstrumentID(),md.getTradingDateTime(), TimeUnits.TIME_10D, TimeUnits.TIME_5D);
+		this.oHLCDataService.addOHLCDataItem(md.getInstrumentID(),md.getTradingDateTime(), TimeUnits.TIME_15D, TimeUnits.TIME_5D);
+		
+		List<Tick> ticks = new ArrayList<Tick>();
+		
+		Set<OHLCDataItem> mdls = this.oHLCDataService.getOHLCDataList(md.getInstrumentID(),md.getTradingDateTime(), TimeUnits.TIME_30S);
+		for(OHLCDataItem mdata:mdls){
+			Tick tk = new Tick(new DateTime(mdata.getPriceTime()),mdata.getOpenPrice(),mdata.getHighPrice(),mdata.getLowPrice(),mdata.getClosePrice(),mdata.getVolume());
+			ticks.add(tk);
+		}
+		TimeSeries series = new TimeSeries(ticks);
+		Strategy strategy = DoubleMAStrategy.buildStrategy(series);
+		TradingRecord tradingRecord = series.run(strategy);
+		int endIndex = series.getEnd();
+		if(strategy.shouldEnter(endIndex)){
+			System.out.println(md.getInstrumentID()+"-》出现买入信号："+md.getTradingDay()+" "+md.getUpdateTime()+" "+md.getUpdateMillisec());
+			if(volume==0){
+				volume = (int) (total * 0.6/md.getBidPrice1());
+				tradingRecord.enter(endIndex,Decimal.valueOf(md.getAskPrice1()), Decimal.valueOf(volume));
+				total = total-volume*md.getAskPrice1();
+				System.out.println("可用余额："+total);
+				
+				System.out.println("交易次数: " + new NumberOfTradesCriterion().calculate(series, tradingRecord));
+				 // Total profit
+		        TotalProfitCriterion totalProfit = new TotalProfitCriterion();
+		        System.out.println("总盈利: " + totalProfit.calculate(series, tradingRecord));
+			}
+			
+		}
+		if(strategy.shouldExit(series.getEnd())){
+			System.out.println(md.getInstrumentID()+"-》出现卖出信号："+md.getTradingDay()+" "+md.getUpdateTime()+" "+md.getUpdateMillisec());
+			if(volume>0){
+				tradingRecord.exit(endIndex,Decimal.valueOf(md.getBidPrice1()), Decimal.valueOf(volume));
+				total+=volume*md.getBidPrice1();
+				volume = 0;
+				System.out.println("可用余额："+total);
+				
+				System.out.println("交易次数: " + new NumberOfTradesCriterion().calculate(series, tradingRecord));
+				 // Total profit
+		        TotalProfitCriterion totalProfit = new TotalProfitCriterion();
+		        System.out.println("总盈利: " + totalProfit.calculate(series, tradingRecord));
+			}
+			
+		}
+		return null;
+	}
+	public void setMarketDataDao(MarketDataDao marketDataDao) {
+		this.marketDataDao = marketDataDao;
+	}
+	public void setoHLCDataService(OHLCDataService oHLCDataService) {
+		this.oHLCDataService = oHLCDataService;
+	}
+
+}

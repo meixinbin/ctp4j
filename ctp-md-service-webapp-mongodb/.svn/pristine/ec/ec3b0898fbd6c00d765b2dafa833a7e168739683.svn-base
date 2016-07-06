@@ -1,0 +1,32 @@
+package com.itqy8.ctp.md.dao;
+
+import java.util.List;
+
+import com.itqy8.ctp.md.entity.MarketData;
+import com.itqy8.framework.dao.BaseDaoImpl;
+
+/**
+ * 
+ * @author meixinbin
+ *
+ */
+public class MarketDataDaoImpl extends BaseDaoImpl implements MarketDataDao{
+
+	private static final long serialVersionUID = 1L;
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<MarketData> getMarketData30s(String instrumentID) {
+		String hql = "from MarketData md where md.instrumentID=:instrumentID";
+		return getCurrentSession().createQuery(hql).setString("instrumentID", instrumentID).list();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<MarketData> getMarketData(String instrumentID, long start, long end) {
+		String hql = "from MarketData md where md.instrumentID=:instrumentID and md.tradingDateTime>=:start and md.tradingDateTime<=:end";
+		return getCurrentSession().createQuery(hql).setString("instrumentID", instrumentID).setLong("start", start).setLong("end", end).list();
+	}
+
+
+}

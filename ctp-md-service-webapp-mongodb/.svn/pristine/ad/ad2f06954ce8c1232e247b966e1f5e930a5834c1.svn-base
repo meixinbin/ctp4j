@@ -1,0 +1,98 @@
+package com.itqy8.data.entity;
+
+import java.io.Serializable;
+
+/**
+ * This is an object that contains data related to the tb_market_data_30s table.
+ * Do not modify this class because it will be overwritten if the configuration file
+ * related to this class is modified.
+ *
+ *  table="tb_market_data_30s"
+ *
+ * @author meixinbin
+ * @version 1.0
+ */
+public class MarketDataTimeUnit implements Serializable{
+
+	private static final long serialVersionUID = 1L;
+	
+	/**收盘价*/
+	private Double closePrice;
+		
+	/**开盘价*/
+	private Double openPrice;
+		
+	/**最高价*/
+	private Double highPrice;
+		
+	/**最低价*/
+	private Double lowPrice;
+		
+	/**当前价格时间*/
+	private Long priceTime;
+	
+	/**Volume of the period*/
+	private Double volume;
+	
+	/**合约代码*/
+	private String instrumentId;
+	
+	public String getInstrumentId() {
+		return instrumentId;
+	}
+
+	public void setInstrumentId(String instrumentId) {
+		this.instrumentId = instrumentId;
+	}
+
+	public Double getClosePrice() {
+		return closePrice;
+	}
+
+	public void setClosePrice(Double closePrice) {
+		this.closePrice = closePrice;
+	}
+
+	public Double getOpenPrice() {
+		return openPrice;
+	}
+
+	public void setOpenPrice(Double openPrice) {
+		this.openPrice = openPrice;
+	}
+
+	public Long getPriceTime() {
+		return priceTime;
+	}
+
+	public void setPriceTime(Long priceTime) {
+		this.priceTime = priceTime;
+	}
+
+	public Double getHighPrice() {
+		return highPrice;
+	}
+
+	public void setHighPrice(Double highPrice) {
+		this.highPrice = highPrice;
+	}
+
+	public Double getLowPrice() {
+		return lowPrice;
+	}
+
+	public void setLowPrice(Double lowPrice) {
+		this.lowPrice = lowPrice;
+	}
+
+	public double getVolume() {
+		return volume;
+	}
+
+	public void setVolume(Double volume) {
+		this.volume = volume;
+	}
+	
+				
+		
+}

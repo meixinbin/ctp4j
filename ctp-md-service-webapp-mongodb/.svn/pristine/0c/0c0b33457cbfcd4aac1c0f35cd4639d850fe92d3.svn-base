@@ -1,0 +1,178 @@
+package com.itqy8.framework.startup;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+
+import org.apache.log4j.PropertyConfigurator;
+import org.joda.time.DateTime;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+
+import com.ctp.dao.MarketDataDao;
+import com.ctp.data.MarketData;
+import com.ctp.data.OHLCDataItem;
+import com.ctp.data.service.MarketDataService;
+import com.ctp.data.service.OHLCDataService;
+import com.ctp.strategy.CCICorrectionStrategy;
+import com.google.common.util.concurrent.AbstractIdleService;
+import com.itqy8.ctp.enums.TimeUnits;
+import com.itqy8.framework.util.SpringUtil;
+
+import eu.verdelhan.ta4j.AnalysisCriterion;
+import eu.verdelhan.ta4j.Strategy;
+import eu.verdelhan.ta4j.Tick;
+import eu.verdelhan.ta4j.TimeSeries;
+import eu.verdelhan.ta4j.TradingRecord;
+import eu.verdelhan.ta4j.analysis.criteria.TotalProfitCriterion;
+
+public class BootstrapTest extends AbstractIdleService {
+
+	
+	private ClassPathXmlApplicationContext context;
+	public static void main(String[] args) {
+		try {
+			InputStream input = BootstrapTest.class.getClassLoader().getResourceAsStream("config/log4j.properties");
+			Properties prop = new Properties();
+			prop.load(input);
+			PropertyConfigurator.configure(prop);
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("ERROR: Unable to load config/log4j.properties");
+		}
+		BootstrapTest bootstrap = new BootstrapTest();
+		bootstrap.startAsync();
+		try {
+			Object lock = new Object();
+			synchronized (lock) {
+				while (true) {
+					lock.wait();
+				}
+			}
+		} catch (InterruptedException ex) {
+			System.err.println("ignoreinterruption");
+		}
+	}
+
+	@Override
+	protected void shutDown() throws Exception {
+		context.stop();
+		System.out.println("-------------service stopped successfully-------------");
+	}
+	@Override
+	protected void startUp() throws Exception {
+		context = new ClassPathXmlApplicationContext("classpath:config/spring/*.xml");
+		context.start();
+		//
+		context.registerShutdownHook();
+		
+		/*//本期已经过去的毫秒数
+		int timePeriod=3000000;
+		long time = 1464233415500L;
+		long passMillis = time%timePeriod;
+		long start = time-passMillis;
+		
+		System.out.println("current:"+new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date(time)));
+		System.out.println("start:"+new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date(start)));
+		System.out.println("passMillis:"+passMillis);
+		long end = start+timePeriod;
+		Collection<Object> idls = new ArrayList<Object>();
+		for(long i=start;i<end;i=i+500){
+			idls.add("bu1606:"+i);
+		}*/
+		
+		/*MarketDataDao marketDataDao = (MarketDataDao) SpringUtil.getBean("marketDataDao");
+		MarketData md1 = new MarketData();
+		md1.setInstrumentID("rb1610");
+		md1.setTradingDateTime(5l);
+		MarketData md2 = new MarketData();
+		md2.setInstrumentID("rb1610");
+		md2.setTradingDateTime(3l);
+		MarketData md3 = new MarketData();
+		md3.setInstrumentID("rb1610");
+		md3.setTradingDateTime(6L);
+		MarketData md4 = new MarketData();
+		md4.setInstrumentID("rb1610");
+		md4.setTradingDateTime(2l);
+		marketDataDao.addZset(md1);
+		marketDataDao.addZset(md2);
+		marketDataDao.addZset(md3);
+		marketDataDao.addZset(md4);
+		
+		Set<MarketData> setls = marketDataDao.getList("rb1610", 0, 10);
+		for(MarketData m:setls){
+			System.out.println(m.getTradingDateTime());
+		}*/
+		MarketDataService marketDataService = (MarketDataService) SpringUtil.getBean("marketDataService");
+		OHLCDataService oHLCDataService = (OHLCDataService) SpringUtil.getBean("oHLCDataService");
+		/*// 根据合约代码和时间区间获取价格最高的和最低的
+		List<Object> mdls = baseRedisDao.get(idls);
+		System.out.println(mdls);*/
+		List<Tick> ticks = new ArrayList<Tick>();
+		TimeSeries series = new TimeSeries(ticks);
+		Strategy strategy = CCICorrectionStrategy.buildStrategy(series);
+		for(int i=0;i<ticks.size();i++){
+			if(strategy.shouldEnter(i)){
+				System.out.println("-》出现金叉：");
+				System.out.println(i);
+			}
+		}
+		
+		if(strategy.shouldExit(ticks.size()-1)){
+			System.out.println("-》出现死叉：");
+		}
+		 // Running the strategy
+        TradingRecord tradingRecord = series.run(strategy);
+        System.out.println("Number of trades for the strategy: " + tradingRecord.getTradeCount());
+
+        // Analysis
+        System.out.println("Total profit for the strategy: " + new TotalProfitCriterion().calculate(series, tradingRecord));
+        
+        AnalysisCriterion criterion = new TotalProfitCriterion();
+       System.out.println(criterion.calculate(series, tradingRecord));;
+		/*JedisConnectionFactory cc = (JedisConnectionFactory) SpringUtil.getBean("jedisConnectionFactory");
+		cc.getConnection().flushDb();*/
+		/*long zstart = System.currentTimeMillis();
+		for(int i=0;i<10000;i++){
+			redisTemplate.opsForZSet().add("zsetTest",new MarketData(), i);
+		}
+		
+		System.out.println("向zset中插入1万条数据耗时："+ (System.currentTimeMillis()-zstart));*/
+		
+		/*long hstart = System.currentTimeMillis();
+		
+		for(int i=0;i<10000;i++){
+			redisTemplate.opsForHash().put("hashTest1", i, i);
+		}
+		
+		System.out.println("向hash中插入1万条数据耗时："+ (System.currentTimeMillis()-hstart));*/
+		
+		/*long hqstart = System.currentTimeMillis();
+		Collection<Object> hashKeys = new ArrayList<Object>();
+		for(int i=0;i<10000;i++){
+			hashKeys.add(i);
+		}
+		List<Object> ls = redisTemplate.opsForHash().multiGet("hashTest", hashKeys);
+		for(Object o:ls){
+			MarketData md = JacksonUtils.jsonToObject((String)o, MarketData.class);
+		}
+		System.out.println("查询hash 1万条数据耗时："+ (System.currentTimeMillis()-hqstart));
+		System.out.println(ls.size());
+		
+		long zsqstart = System.currentTimeMillis();
+		
+		Set<TypedTuple<MarketData>> set  = redisTemplate.opsForZSet().rangeByScoreWithScores("zsetTest", 0, 100000);
+		
+		System.out.println("查询zset 1万条数据耗时："+ (System.currentTimeMillis()-zsqstart));
+		
+		
+		System.out.println(set.size());
+		*/
+		
+		System.out.println("----------------provider service started successfully------------");
+	}
+
+}

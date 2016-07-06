@@ -1,0 +1,19 @@
+package com.ctp.data.entity;
+
+import com.ctp.util.TimeDateUtils;
+
+public class OHLCData1Minute extends OHLCDataItem{
+
+	@Override
+	public long[] timePeriod(long now) {
+		return TimeDateUtils.timePeriod(now, 60000);
+	}
+
+	@Override
+	public <T> Class<? extends OHLCDataItem> getSubClass() {
+		return OHLCData30MS.class;
+	}
+
+
+	
+}

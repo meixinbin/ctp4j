@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo" xsi:schemaLocation="http://www.springframework.org/schema/beans      
+http://www.springframework.org/schema/beans/spring-beans.xsd       
+http://code.alibabatech.com/schema/dubbo
+http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+
+	<dubbo:application name="${dubbo.application.name}" owner="meixinbin" organization="itqy8" />
+
+	<!-- <dubbo:monitor protocol="registry"/> -->
+	<dubbo:registry address="${dubbo.zookeeper.url}" timeout="99999999"/>
+	<!-- <dubbo:monitor protocol="registry"/> -->
+	<dubbo:protocol name="dubbo" port="${dubbo.port}"></dubbo:protocol>
+	
+	<!-- <dubbo:protocol name="rest" port="8888" threads="1000" contextpath="services" server="servlet" accepts="1000"/> -->
+
+
+	<dubbo:reference id="traderService" interface="com.ctp.trader.service.TraderService" />
+	<dubbo:reference id="marketDataService" interface="com.ctp.data.service.MarketDataService" />
+	<dubbo:reference id="oHLCDataService" interface="com.ctp.data.service.OHLCDataService" />
+	<dubbo:reference id="tradingAccountService" interface="com.ctp.trader.service.TradingAccountService" />
+	<dubbo:reference id="investorPositionService" interface="com.ctp.trader.service.InvestorPositionService" />
+	
+</beans>

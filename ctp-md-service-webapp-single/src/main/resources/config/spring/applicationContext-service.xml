@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 	
-	<bean class="com.ctp.strategy.Strategy2" id="marketTradeTrategy" init-method="init">
+	<bean class="com.ctp.strategy.Strategy018" id="marketTradeTrategy" init-method="init">
 		<property name="marketDataService" ref="marketDataService"/>
 		<property name="oHLCDataService" ref="oHLCDataService"/>
 		<property name="tradingAccountService" ref="tradingAccountService"/>

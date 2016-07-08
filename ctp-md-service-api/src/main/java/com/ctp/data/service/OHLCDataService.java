@@ -32,7 +32,7 @@ public interface OHLCDataService {
 	
 	public <T extends OHLCDataItem> List<T> getList(Class<T> clazz,String instrumentId,long start,long end,int count);
 	public <T extends OHLCDataItem> List<T> getList(Class<T> clazz,String instrumentId,int count);
-	
+	public <T extends OHLCDataItem> List<T> getLatestList(Class<T> clazz, String instrumentId, int count);
 	public <T extends OHLCDataItem> int  getKLine(Class<T> clazz,String instrumentId,long time);
 	
 	public OHLCData1Day getById(String instrumentId,long id);

@@ -23,15 +23,6 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>com.itqy8</groupId>
-			<artifactId>itqy8-framework-common</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.itqy8</groupId>
-			<artifactId>user-service-api</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>

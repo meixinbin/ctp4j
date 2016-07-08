@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo" xsi:schemaLocation="http://www.springframework.org/schema/beans      
+http://www.springframework.org/schema/beans/spring-beans.xsd       
+http://code.alibabatech.com/schema/dubbo
+http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+	<dubbo:application name="${dubbo.application.name}" owner="meixinbin" organization="meixinbin" />
+
+	<dubbo:registry address="${dubbo.zookeeper.url}" />
+	<dubbo:protocol name="dubbo" port="${dubbo.port}" host="${dubbo.protocol.host}"></dubbo:protocol>
+	<!-- <dubbo:provider token="true" timeout="10000"></dubbo:provider> -->
+	<!-- <dubbo:monitor protocol="registry"/> -->
+	
+	<!-- <dubbo:protocol name="rest" port="8888" threads="1000" contextpath="services" server="servlet" accepts="1000"/> -->
+
+	<dubbo:service interface="com.itqy8.sequence.service.SequenceService" ref="sequenceService" validation="true" timeout="9000000"/>
+
+	<bean id="sequenceService" class="com.itqy8.sequence.service.SequenceServiceImpl">
+		<property name="jedisConnectionFactory" ref="jedisConnectionFactory"></property>
+	</bean>
+
+</beans>

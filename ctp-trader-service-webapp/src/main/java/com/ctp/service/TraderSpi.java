@@ -152,7 +152,8 @@ public class TraderSpi extends CThostFtdcTraderSpi{
 				Thread.sleep(3000);//暂停3秒钟
 				//查询用户持仓
 				this.traderApiTriggerService.qryInvestorPosition(brokerID, instrumentID, investorID);
-//				this.traderApiTriggerService.qryInvestorPositionDetail(brokerID, instrumentID, investorID);
+				Thread.sleep(3000);//暂停3秒钟
+				this.traderApiTriggerService.qryInvestorPositionDetail(brokerID, instrumentID, investorID);
 				
 			}
 		} catch (InterruptedException e) {

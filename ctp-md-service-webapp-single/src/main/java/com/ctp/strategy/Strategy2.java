@@ -85,20 +85,20 @@ public class Strategy2 implements MarketTradeTrategy{
 		}
         TimeSeries series=new TimeSeries("rb1610",Period.minutes(1));
 		//
-		List<OHLCData1Minute> ls = this.oHLCDataService.getList(OHLCData1Minute.class, pDepthMarketData.getInstrumentID(), 300);
+		List<OHLCData1Minute> ls = this.oHLCDataService.getLatestList(OHLCData1Minute.class, pDepthMarketData.getInstrumentID(), 300);
 		for(OHLCData1Minute o:ls){
 			series.addTick(new Tick(new DateTime(o.getId()), Decimal.valueOf(o.getOpenPrice()), Decimal.valueOf(o.getHighPrice()), Decimal.valueOf(o.getLowPrice()), Decimal.valueOf(o.getClosePrice()),Decimal.valueOf(o.getVolume())));
 		}
 		Strategy strategy = KLineShapeStrategy.buildStrategy(series);
 		if(strategy.shouldEnter(series.getEnd())){
-			System.out.println("进入买开条件");
 			if(piv.getBK()==0 && piv.getYDBK()==0){
-				this.traderService.bk(pDepthMarketData.getInstrumentID(), pDepthMarketData.getExchangeID(), pDepthMarketData.getAskPrice1(), '1', 1);
+				System.out.println("进入买开条件");
+				this.traderService.bk(pDepthMarketData.getInstrumentID(), pDepthMarketData.getExchangeID(), pDepthMarketData.getAskPrice1(), '2', 1);
 				this.piv.setBK(1);
 				tr.enter(series.getEnd(), Decimal.valueOf(pDepthMarketData.getAskPrice1()), Decimal.valueOf(1));
 			}
 			if(this.piv.getSK()>0){
-				this.traderService.bp(pDepthMarketData.getInstrumentID(), pDepthMarketData.getExchangeID(), pDepthMarketData.getAskPrice1(), '1', 1);
+				this.traderService.bp(pDepthMarketData.getInstrumentID(), pDepthMarketData.getExchangeID(), pDepthMarketData.getAskPrice1(), '2', 1);
 				this.piv.setSK(0);
 			}
 		}
@@ -107,11 +107,11 @@ public class Strategy2 implements MarketTradeTrategy{
 			if(piv.getYDBK()>0 || piv.getBK()>0){
 				System.out.println("进入平仓条件"+piv.getYDBK()+","+piv.getBK());
 				//平仓
-				this.traderService.sp(pDepthMarketData.getInstrumentID(), pDepthMarketData.getExchangeID(), pDepthMarketData.getBidPrice1(), '1', piv.getYDSK()+piv.getBK());
+				this.traderService.sp(pDepthMarketData.getInstrumentID(), pDepthMarketData.getExchangeID(), pDepthMarketData.getBidPrice1(), '2', piv.getYDSK()+piv.getBK());
 				this.piv.setBK(0);
-				this.piv.setYDSK(0);
+				this.piv.setYDBK(0);
 			}else{
-				this.traderService.sk(pDepthMarketData.getInstrumentID(), pDepthMarketData.getExchangeID(), pDepthMarketData.getAskPrice1(), '1',1);
+				this.traderService.sk(pDepthMarketData.getInstrumentID(), pDepthMarketData.getExchangeID(), pDepthMarketData.getAskPrice1(), '2',1);
 				this.piv.setSK(1);
 			}
 		}

@@ -2,9 +2,7 @@ package com.itqy8.framework.startup;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -16,9 +14,10 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ta4jexamples.analysis.TotalProfitAmount;
 
 import com.ctp.data.entity.OHLCData1Day;
+import com.ctp.data.entity.OHLCData1Minute;
 import com.ctp.data.service.OHLCDataService;
+import com.ctp.ta4j.strategy.extra.KLineShapeStrategy;
 import com.ctp.ta4j.strategy.extra.My018Strategy;
-import com.ctp.trader.service.TraderService;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.itqy8.framework.util.SpringUtil;
 
@@ -76,29 +75,49 @@ public class BootstrapTest extends AbstractIdleService {
 		//
 		context.registerShutdownHook();
 		
-		TraderService traderService= (TraderService) SpringUtil.getBean("traderService");
-		traderService.bk("rb1610","",2360, '1', 1);
+//		TraderService tservice =	(TraderService) SpringUtil.getBean("traderService");
+//		OrderDTO pInputOrder = new OrderDTO();
+//		pInputOrder.setBrokerID("9999");
+//		pInputOrder.setInvestorID("057794");
+//		pInputOrder.setInstrumentID("rb1610");
+//		pInputOrder.setVolumeCondition('1');//成交量类型：任何数量
+//		pInputOrder.setMinVolume(1);/// 最小成交量：1
+//		pInputOrder.setForceCloseReason('0');/// 强平原因：非强平
+//		pInputOrder.setIsAutoSuspend(0);/// 自动挂起标志：否
+//		pInputOrder.setUserForceClose(0);///用户强评标志：否
+//		pInputOrder.setDirection('1');
+//		pInputOrder.setOrderPriceType('2');
+//		pInputOrder.setTimeCondition('3');
+////		pInputOrder.setLimitPrice(2440);
+////		pInputOrder.setStopPrice(2440);
+//		pInputOrder.setCombOffsetFlag("0");
+//		pInputOrder.setCombHedgeFlag("1");
+//		pInputOrder.setVolumeTotalOriginal(1);
+//		pInputOrder.setTimeCondition('1');
+//		pInputOrder.setContingentCondition('1');
+//		tservice.orderInsert(pInputOrder);
 		TimeSeries ts=new TimeSeries("rb1610",Period.days(1));
 		//
 		OHLCDataService oHLCDataService = (OHLCDataService) SpringUtil.getBean("oHLCDataService");
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(System.currentTimeMillis());
-		cal.add(Calendar.DAY_OF_MONTH, -20);
-		List<OHLCData1Day> ls = oHLCDataService.getList(OHLCData1Day.class, "rb1610",cal.getTimeInMillis(),System.currentTimeMillis(), 100000);
-		for(OHLCData1Day o:ls){
+		cal.add(Calendar.DAY_OF_MONTH, -50);
+		List<OHLCData1Minute> ls = oHLCDataService.getLatestList(OHLCData1Minute.class, "rb1610", 300);
+		for(OHLCData1Minute o:ls){
 			ts.addTick(new Tick(new DateTime(o.getId()), Decimal.valueOf(o.getOpenPrice()), Decimal.valueOf(o.getHighPrice()), Decimal.valueOf(o.getLowPrice()), Decimal.valueOf(o.getClosePrice()),Decimal.valueOf(o.getVolume())));
 		}
 //		Strategy strategy = KLineShapeStrategy.buildStrategy(ts);
 		My018Strategy<OHLCData1Day> strategy18 = new My018Strategy<OHLCData1Day>();
-		Strategy strategy = strategy18.buildStrategy(ts, "rb1610", OHLCData1Day.class);
+//		Strategy strategy = strategy18.buildStrategy(ts, "rb1610", OHLCData1Day.class);
+		Strategy strategy = KLineShapeStrategy.buildStrategy(ts);
 		// Running the strategy
         TradingRecord tradingRecord = ts.run(strategy);
         System.out.println("Number of trades for the strategy: " + tradingRecord.getTradeCount());
         List<Trade> tradels = tradingRecord.getTrades();
-        for(Trade t:tradels){
-        	System.out.println("买入信号："+new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date(ts.getTick(t.getEntry().getIndex()).getBeginTime().getMillis())));
-        	System.out.println("卖出信号："+new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date(ts.getTick(t.getExit().getIndex()).getBeginTime().getMillis())));
-        }
+//        for(Trade t:tradels){
+//        	System.out.println("买入信号："+new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date(ts.getTick(t.getEntry().getIndex()).getBeginTime().getMillis())));
+//        	System.out.println("卖出信号："+new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date(ts.getTick(t.getExit().getIndex()).getBeginTime().getMillis())));
+//        }
      // Total profit
         TotalProfitCriterion totalProfit = new TotalProfitCriterion();
         TotalProfitAmount totalProfitAmount = new TotalProfitAmount();
@@ -111,7 +130,7 @@ public class BootstrapTest extends AbstractIdleService {
      // 风险报酬率
         System.out.println("Reward-risk ratio: " + new RewardRiskRatioCriterion().calculate(ts, tradingRecord));
         // Total transaction cost
-        System.out.println("Total transaction cost (from $1000): " + new LinearTransactionCostCriterion(23000, 0.0003).calculate(ts, tradingRecord));
+        System.out.println("Total transaction cost (from $1000): " + new LinearTransactionCostCriterion(2300, 0.0009).calculate(ts, tradingRecord));
         // Buy-and-hold
         System.out.println("Buy-and-hold: " + new BuyAndHoldCriterion().calculate(ts, tradingRecord));
         // Total profit vs buy-and-hold

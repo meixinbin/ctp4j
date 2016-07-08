@@ -3,6 +3,7 @@ package com.ctp.data.service;
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -144,6 +145,12 @@ public class OHLCDataServiceImpl implements OHLCDataService{
 	@Override
 	public <T extends OHLCDataItem> List<T> getList(Class<T> clazz, String instrumentId, int count) {
 		return this.oHLCDataDao.getList(clazz, instrumentId, count);
+	}
+	@Override
+	public <T extends OHLCDataItem> List<T> getLatestList(Class<T> clazz, String instrumentId, int count) {
+		List<T> ls = this.oHLCDataDao.getLatestList(clazz, instrumentId, count);
+		Collections.reverse(ls);
+		return ls;
 	}
 	public <T extends OHLCDataItem>T getLastOHCLData(Class<T> clazz,String instrumentId,long now) {
 		T item = null;

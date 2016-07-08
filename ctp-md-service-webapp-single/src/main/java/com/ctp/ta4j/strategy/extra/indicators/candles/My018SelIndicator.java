@@ -32,6 +32,10 @@ public class My018SelIndicator<T extends OHLCDataItem> extends CachedIndicator<B
 
 	@Override
 	protected Boolean calculate(int index) {
+		if(index==0){
+			return false;
+		}
+		Tick tk0 = this.getTimeSeries().getTick(index-1);
 		Tick tk = this.getTimeSeries().getTick(index);
         long begin = tk.getBeginTime().getMillis();
         Calendar cal = Calendar.getInstance();
@@ -55,7 +59,16 @@ public class My018SelIndicator<T extends OHLCDataItem> extends CachedIndicator<B
         	this.ll = yd.getLowPrice();
         	this.cc = yd.getClosePrice();
         	this.oo = today.getOpenPrice();
+        	/*if(tk.getMaxPrice().isGreaterThan(tk0.getMaxPrice())){
+				this.oo = 0;
+			}else{
+				this.oo = today.getOpenPrice();
+			}*/
+        	this.oo = today.getOpenPrice();
         	double cfj = Math.max(hh - cc, cc - ll) * 0.5;
+        	/*if(tk.getMaxPrice().isGreaterThan(tk0.getMaxPrice())){
+        		cfj = 0;
+			}*/
         	double bb = oo - cfj;
         	if (tk.getMinPrice().isLessThan(Decimal.valueOf(bb)) && nn > 1) {
     			return true;

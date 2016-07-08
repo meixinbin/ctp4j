@@ -30,6 +30,10 @@ public class My018BuyIndicator<T extends OHLCDataItem> extends CachedIndicator<B
 
 	@Override
 	protected Boolean calculate(int index) {
+		if(index==0){
+			return false;
+		}
+		Tick tk0 = this.getTimeSeries().getTick(index-1);
 		Tick tk = this.getTimeSeries().getTick(index);
 		long begin = tk.getBeginTime().getMillis();
 		Calendar cal = Calendar.getInstance();
@@ -52,9 +56,18 @@ public class My018BuyIndicator<T extends OHLCDataItem> extends CachedIndicator<B
 			this.hh = yd.getHighPrice();
 			this.ll = yd.getLowPrice();
 			this.cc = yd.getClosePrice();
+			
+			/*if(tk.getMaxPrice().isGreaterThan(tk0.getMaxPrice())){
+				this.oo = 0;
+			}else{
+				this.oo = today.getOpenPrice();
+			}*/
 			this.oo = today.getOpenPrice();
-			double cfj = Math.max(hh - cc, cc -       ll) * 0.5;
+			double cfj = Math.max(hh - cc, cc - ll) * 0.5;
 			double aa = oo + cfj;
+			/*if(tk.getMaxPrice().isGreaterThan(tk0.getMaxPrice())){
+        		cfj = 0;
+			}*/
 			if (tk.getMaxPrice().isGreaterThan(Decimal.valueOf(aa)) && nn > 1) {
 				return true;
 			}

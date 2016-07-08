@@ -7,16 +7,13 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import com.ctp.trader.entity.Instrument;
-import com.itqy8.framework.dao.BaseDaoImpl;
 
 /**
  * 
  * @author meixinbin
  *
  */
-public class InstrumentDaoImpl extends BaseDaoImpl implements InstrumentDao{
-
-	private static final long serialVersionUID = 1L;
+public class InstrumentDaoImpl implements InstrumentDao{
 
 	private MongoTemplate mongoTemplate;
 	

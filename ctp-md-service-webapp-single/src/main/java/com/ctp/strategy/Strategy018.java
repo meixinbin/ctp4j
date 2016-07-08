@@ -46,7 +46,7 @@ public class Strategy018 implements MarketTradeTrategy{
 		String brokerID = SpringPropertyResourceReader.getProperty("ctp.brokerId");
 		String investorID = SpringPropertyResourceReader.getProperty("ctp.userid");
 		String instrumentID = "rb1610";
-		List<InvestorPositionDTO> ls = this.investorPositionService.getList(brokerID, instrumentID, investorID);
+		/*List<InvestorPositionDTO> ls = this.investorPositionService.getList(brokerID, instrumentID, investorID);
 		if(ls!=null){
 			for(InvestorPositionDTO dto:ls){
 				if(dto.getPosiDirection()=='2'){
@@ -55,13 +55,12 @@ public class Strategy018 implements MarketTradeTrategy{
 					piv.setYDSK(piv.getYDSK()+dto.getPosition());
 				}
 			}
-		}
+		}*/
 		
-		taDto = tradingAccountService.getTradingAccount(brokerID,investorID);
+//		taDto = tradingAccountService.getTradingAccount(brokerID,investorID);
 	}
 	@Override
 	public void trade(CThostFtdcDepthMarketDataField pDepthMarketData) {
-		long start = System.currentTimeMillis();
 		MarketData md = new MarketData();
 		try {
 			BeanUtils.copyProperties(md, pDepthMarketData);
@@ -77,11 +76,11 @@ public class Strategy018 implements MarketTradeTrategy{
         if(strategy.shouldEnter(ts.getEnd())){
         	//买平开
         	if(this.piv.getSK()>0){
-				this.traderService.bp(pDepthMarketData.getInstrumentID(), pDepthMarketData.getExchangeID(), pDepthMarketData.getAskPrice1(), '1', 1);
+				this.traderService.bp(pDepthMarketData.getInstrumentID(), pDepthMarketData.getExchangeID(), pDepthMarketData.getAskPrice1(), '2', 1);
 				this.piv.setSK(0);
 			}
         	if(piv.getBK()==0 && piv.getYDBK()==0){
-				this.traderService.bk(pDepthMarketData.getInstrumentID(), pDepthMarketData.getExchangeID(), pDepthMarketData.getAskPrice1(), '1', 1);
+				this.traderService.bk(pDepthMarketData.getInstrumentID(), pDepthMarketData.getExchangeID(), pDepthMarketData.getAskPrice1(), '2', 1);
 				this.piv.setBK(1);
 			}
         }
@@ -90,12 +89,12 @@ public class Strategy018 implements MarketTradeTrategy{
         	//卖平开
         	if(piv.getYDBK()>0 || piv.getBK()>0){
 				//平仓
-				this.traderService.sp(pDepthMarketData.getInstrumentID(), pDepthMarketData.getExchangeID(), pDepthMarketData.getBidPrice1(), '1', piv.getYDSK()+piv.getBK());
+				this.traderService.sp(pDepthMarketData.getInstrumentID(), pDepthMarketData.getExchangeID(), pDepthMarketData.getBidPrice1(), '2', piv.getYDSK()+piv.getBK());
 				this.piv.setBK(0);
 				this.piv.setYDSK(0);
 				System.out.println("发生一次交易");
 			}
-        	this.traderService.sk(pDepthMarketData.getInstrumentID(), pDepthMarketData.getExchangeID(), pDepthMarketData.getAskPrice1(), '1',1);
+        	this.traderService.sk(pDepthMarketData.getInstrumentID(), pDepthMarketData.getExchangeID(), pDepthMarketData.getAskPrice1(), '2',1);
 			this.piv.setSK(1);
         }
 	}

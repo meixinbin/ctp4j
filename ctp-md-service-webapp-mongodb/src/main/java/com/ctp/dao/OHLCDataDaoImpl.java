@@ -59,6 +59,10 @@ public class OHLCDataDaoImpl implements OHLCDataDao{
 		}
 		return null;
 	}
+	@Override
+	public <T extends OHLCDataItem> List<T> getLatestList(Class<T> clazz, String instrumentId, int count) {
+		return mongoTemplate.find(new Query().addCriteria(Criteria.where("instrumentId").is(instrumentId)).limit(count).with(new Sort(Sort.Direction.DESC, "id")), clazz);
+	}
 	
 
 }

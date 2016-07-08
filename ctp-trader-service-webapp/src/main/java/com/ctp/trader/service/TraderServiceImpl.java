@@ -112,7 +112,6 @@ public class TraderServiceImpl implements TraderService{
 		pInputOrder.setVolumeTotalOriginal(volume);
 		pInputOrder.setContingentCondition('1');
 		pInputOrder.setRequestID(this.sequenceService.generate("request_id").getResult().intValue());
-		
 		TraderApiWrap.getTraderApi().ReqOrderInsert(pInputOrder, pInputOrder.getRequestID());
 	}
 

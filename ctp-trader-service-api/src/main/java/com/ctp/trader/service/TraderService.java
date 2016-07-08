@@ -46,6 +46,8 @@ public interface TraderService {
 	 */
 	public void bp(String instrumentid,String exchangeid,double price,char pricetype,int volume);
 	
+	public void yd_bp(String instrumentid, String exchangeid, double price, char pricetype, int volume);
+	
 	/**
 	 * 卖平
 	 * @param instrumentid
@@ -57,6 +59,7 @@ public interface TraderService {
 	 */
 	public void sp(String instrumentid,String exchangeid,double price,char pricetype,int volume);
 	
+	public void yd_sp(String instrumentid, String exchangeid, double price, char pricetype, int volume);
 	
 	public Long getLatestTradeTime(String instrumentID,char offsetFlag,char direction);
 	

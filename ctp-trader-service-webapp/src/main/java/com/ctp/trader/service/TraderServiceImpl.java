@@ -145,7 +145,7 @@ public class TraderServiceImpl implements TraderService{
 	}
 
 	@Override
-	public void bp(String instrumentid, String exchangeid, double price, char pricetype, int volume) {
+	public void yd_bp(String instrumentid, String exchangeid, double price, char pricetype, int volume) {
 		CThostFtdcInputOrderField pInputOrder = new CThostFtdcInputOrderField();
 		pInputOrder.setBrokerID(brokerID);
 		pInputOrder.setInvestorID(investorID);
@@ -171,9 +171,62 @@ public class TraderServiceImpl implements TraderService{
 		pInputOrder.setRequestID(this.sequenceService.generate("request_id").getResult().intValue());
 		TraderApiWrap.getTraderApi().ReqOrderInsert(pInputOrder, pInputOrder.getRequestID());
 	}
+	@Override
+	public void bp(String instrumentid, String exchangeid, double price, char pricetype, int volume) {
+		CThostFtdcInputOrderField pInputOrder = new CThostFtdcInputOrderField();
+		pInputOrder.setBrokerID(brokerID);
+		pInputOrder.setInvestorID(investorID);
+		pInputOrder.setInstrumentID(instrumentid);
+		pInputOrder.setOrderRef(this.sequenceService.generate("order_ref").getResult()+"");
+		pInputOrder.setUserID(investorID);
+		
+		pInputOrder.setVolumeCondition('1');//成交量类型：任何数量
+		pInputOrder.setMinVolume(1);/// 最小成交量：1
+		pInputOrder.setForceCloseReason('0');/// 强平原因：非强平
+		pInputOrder.setIsAutoSuspend(0);/// 自动挂起标志：否
+		pInputOrder.setUserForceClose(0);///用户强评标志：否
+		pInputOrder.setDirection('0');
+		
+		pInputOrder.setOrderPriceType(pricetype);
+		pInputOrder.setTimeCondition('3');//当日有效
+		pInputOrder.setLimitPrice(price);
+//		pInputOrder.setStopPrice(order.getStopPrice());
+		pInputOrder.setCombOffsetFlag("3");
+		pInputOrder.setCombHedgeFlag("1");
+		pInputOrder.setVolumeTotalOriginal(volume);
+		pInputOrder.setContingentCondition('1');
+		pInputOrder.setRequestID(this.sequenceService.generate("request_id").getResult().intValue());
+		TraderApiWrap.getTraderApi().ReqOrderInsert(pInputOrder, pInputOrder.getRequestID());
+	}
 
 	@Override
 	public void sp(String instrumentid, String exchangeid, double price, char pricetype, int volume) {
+		CThostFtdcInputOrderField pInputOrder = new CThostFtdcInputOrderField();
+		pInputOrder.setBrokerID(brokerID);
+		pInputOrder.setInvestorID(investorID);
+		pInputOrder.setInstrumentID(instrumentid);
+		pInputOrder.setOrderRef(this.sequenceService.generate("order_ref").getResult()+"");
+		pInputOrder.setUserID(investorID);
+		
+		pInputOrder.setVolumeCondition('1');//成交量类型：任何数量
+		pInputOrder.setMinVolume(1);/// 最小成交量：1
+		pInputOrder.setForceCloseReason('0');/// 强平原因：非强平
+		pInputOrder.setIsAutoSuspend(0);/// 自动挂起标志：否
+		pInputOrder.setUserForceClose(0);///用户强评标志：否
+		pInputOrder.setDirection('1');
+		
+		pInputOrder.setOrderPriceType(pricetype);
+		pInputOrder.setTimeCondition('3');//当日有效
+		pInputOrder.setLimitPrice(price);
+//		pInputOrder.setStopPrice(order.getStopPrice());
+		pInputOrder.setCombOffsetFlag("3");
+		pInputOrder.setCombHedgeFlag("1");
+		pInputOrder.setVolumeTotalOriginal(volume);
+		pInputOrder.setContingentCondition('1');
+		pInputOrder.setRequestID(this.sequenceService.generate("request_id").getResult().intValue());
+		TraderApiWrap.getTraderApi().ReqOrderInsert(pInputOrder, pInputOrder.getRequestID());
+	}
+	public void yd_sp(String instrumentid, String exchangeid, double price, char pricetype, int volume) {
 		CThostFtdcInputOrderField pInputOrder = new CThostFtdcInputOrderField();
 		pInputOrder.setBrokerID(brokerID);
 		pInputOrder.setInvestorID(investorID);

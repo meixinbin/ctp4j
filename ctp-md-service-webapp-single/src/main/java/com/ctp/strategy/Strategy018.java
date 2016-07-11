@@ -6,10 +6,12 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.joda.time.DateTime;
 import org.joda.time.Period;
 
 import com.ctp.data.entity.MarketData;
 import com.ctp.data.entity.OHLCData15Minute;
+import com.ctp.data.entity.OHLCData1Minute;
 import com.ctp.data.service.MarketDataService;
 import com.ctp.data.service.OHLCDataService;
 import com.ctp.md.vo.PositionInfoVO;
@@ -22,7 +24,9 @@ import com.ctp.trader.service.TradingAccountService;
 import com.itqy8.ctp.CThostFtdcDepthMarketDataField;
 import com.itqy8.framework.util.SpringPropertyResourceReader;
 
+import eu.verdelhan.ta4j.Decimal;
 import eu.verdelhan.ta4j.Strategy;
+import eu.verdelhan.ta4j.Tick;
 import eu.verdelhan.ta4j.TimeSeries;
 import eu.verdelhan.ta4j.TradingRecord;
 
@@ -46,7 +50,7 @@ public class Strategy018 implements MarketTradeTrategy{
 		String brokerID = SpringPropertyResourceReader.getProperty("ctp.brokerId");
 		String investorID = SpringPropertyResourceReader.getProperty("ctp.userid");
 		String instrumentID = "rb1610";
-		/*List<InvestorPositionDTO> ls = this.investorPositionService.getList(brokerID, instrumentID, investorID);
+		List<InvestorPositionDTO> ls = this.investorPositionService.getList(brokerID, instrumentID, investorID);
 		if(ls!=null){
 			for(InvestorPositionDTO dto:ls){
 				if(dto.getPosiDirection()=='2'){
@@ -55,9 +59,9 @@ public class Strategy018 implements MarketTradeTrategy{
 					piv.setYDSK(piv.getYDSK()+dto.getPosition());
 				}
 			}
-		}*/
+		}
 		
-//		taDto = tradingAccountService.getTradingAccount(brokerID,investorID);
+		taDto = tradingAccountService.getTradingAccount(brokerID,investorID);
 	}
 	@Override
 	public void trade(CThostFtdcDepthMarketDataField pDepthMarketData) {
@@ -72,6 +76,10 @@ public class Strategy018 implements MarketTradeTrategy{
 //		long[] time = TimeDateUtils.timePeriod(md.getId(), 24*60*60*1000);
 		My018Strategy<OHLCData15Minute> strategy18 = new My018Strategy<OHLCData15Minute>();
 		TimeSeries ts = new TimeSeries(Period.minutes(15));
+		List<OHLCData15Minute>  ls = this.oHLCDataService.getLatestList(OHLCData15Minute.class, "rb1610", 100);
+		for(OHLCData15Minute o:ls){
+			ts.addTick(new Tick(new DateTime(o.getId()), Decimal.valueOf(o.getOpenPrice()), Decimal.valueOf(o.getHighPrice()), Decimal.valueOf(o.getLowPrice()), Decimal.valueOf(o.getClosePrice()),Decimal.valueOf(o.getVolume())));
+		}
 		Strategy strategy = strategy18.buildStrategy(ts, "rb1610", OHLCData15Minute.class);
         if(strategy.shouldEnter(ts.getEnd())){
         	//买平开

@@ -81,7 +81,7 @@ public class Strategy1 implements MarketTradeTrategy{
 //        this.oHLCDataService.add(OHLCData1Day.class, md.getInstrumentID(), md.getId());
 		TimeSeries ts=new TimeSeries("rb1610",Period.minutes(1));
 		//
-		List<OHLCData1Minute> ls = this.oHLCDataService.getList(OHLCData1Minute.class, pDepthMarketData.getInstrumentID(), 300);
+		List<OHLCData1Minute> ls = this.oHLCDataService.getLatestList(OHLCData1Minute.class, pDepthMarketData.getInstrumentID(), 300);
 		for(OHLCData1Minute o:ls){
 			ts.addTick(new Tick(new DateTime(o.getId()), Decimal.valueOf(o.getOpenPrice()), Decimal.valueOf(o.getHighPrice()), Decimal.valueOf(o.getLowPrice()), Decimal.valueOf(o.getClosePrice()),Decimal.valueOf(o.getVolume())));
 		}

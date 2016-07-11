@@ -18,6 +18,8 @@ import com.ctp.data.entity.OHLCData1Minute;
 import com.ctp.data.service.OHLCDataService;
 import com.ctp.ta4j.strategy.extra.KLineShapeStrategy;
 import com.ctp.ta4j.strategy.extra.My018Strategy;
+import com.ctp.trader.dto.OrderDTO;
+import com.ctp.trader.service.TraderService;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.itqy8.framework.util.SpringUtil;
 
@@ -75,27 +77,28 @@ public class BootstrapTest extends AbstractIdleService {
 		//
 		context.registerShutdownHook();
 		
-//		TraderService tservice =	(TraderService) SpringUtil.getBean("traderService");
-//		OrderDTO pInputOrder = new OrderDTO();
-//		pInputOrder.setBrokerID("9999");
-//		pInputOrder.setInvestorID("057794");
-//		pInputOrder.setInstrumentID("rb1610");
-//		pInputOrder.setVolumeCondition('1');//成交量类型：任何数量
-//		pInputOrder.setMinVolume(1);/// 最小成交量：1
-//		pInputOrder.setForceCloseReason('0');/// 强平原因：非强平
-//		pInputOrder.setIsAutoSuspend(0);/// 自动挂起标志：否
-//		pInputOrder.setUserForceClose(0);///用户强评标志：否
-//		pInputOrder.setDirection('1');
-//		pInputOrder.setOrderPriceType('2');
-//		pInputOrder.setTimeCondition('3');
-////		pInputOrder.setLimitPrice(2440);
-////		pInputOrder.setStopPrice(2440);
-//		pInputOrder.setCombOffsetFlag("0");
-//		pInputOrder.setCombHedgeFlag("1");
-//		pInputOrder.setVolumeTotalOriginal(1);
-//		pInputOrder.setTimeCondition('1');
-//		pInputOrder.setContingentCondition('1');
-//		tservice.orderInsert(pInputOrder);
+		TraderService tservice =	(TraderService) SpringUtil.getBean("traderService");
+		OrderDTO pInputOrder = new OrderDTO();
+		pInputOrder.setBrokerID("9999");
+		pInputOrder.setInvestorID("057794");
+		pInputOrder.setInstrumentID("rb1610");
+		pInputOrder.setVolumeCondition('1');//成交量类型：任何数量
+		pInputOrder.setMinVolume(1);/// 最小成交量：1
+		pInputOrder.setForceCloseReason('0');/// 强平原因：非强平
+		pInputOrder.setIsAutoSuspend(0);/// 自动挂起标志：否
+		pInputOrder.setUserForceClose(0);///用户强评标志：否
+		pInputOrder.setDirection('1');
+		pInputOrder.setOrderPriceType('2');
+		pInputOrder.setTimeCondition('3');
+		pInputOrder.setLimitPrice(2388);
+//		pInputOrder.setStopPrice(2440);
+		pInputOrder.setCombOffsetFlag("3");
+		pInputOrder.setCombHedgeFlag("1");
+		pInputOrder.setVolumeTotalOriginal(1);
+		pInputOrder.setTimeCondition('1');
+		pInputOrder.setContingentCondition('1');
+		tservice.orderInsert(pInputOrder);
+//		tservice.sp("rb1610", "", 2391, '2',3);
 		TimeSeries ts=new TimeSeries("rb1610",Period.days(1));
 		//
 		OHLCDataService oHLCDataService = (OHLCDataService) SpringUtil.getBean("oHLCDataService");
@@ -108,8 +111,7 @@ public class BootstrapTest extends AbstractIdleService {
 		}
 //		Strategy strategy = KLineShapeStrategy.buildStrategy(ts);
 		My018Strategy<OHLCData1Day> strategy18 = new My018Strategy<OHLCData1Day>();
-//		Strategy strategy = strategy18.buildStrategy(ts, "rb1610", OHLCData1Day.class);
-		Strategy strategy = KLineShapeStrategy.buildStrategy(ts);
+		Strategy strategy = strategy18.buildStrategy(ts, "rb1610", OHLCData1Day.class);
 		// Running the strategy
         TradingRecord tradingRecord = ts.run(strategy);
         System.out.println("Number of trades for the strategy: " + tradingRecord.getTradeCount());

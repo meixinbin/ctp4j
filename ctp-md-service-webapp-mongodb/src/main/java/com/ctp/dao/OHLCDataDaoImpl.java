@@ -15,13 +15,7 @@ public class OHLCDataDaoImpl implements OHLCDataDao{
 	private MongoTemplate mongoTemplate;
 	
 	public <T extends OHLCDataItem> List<T> getList(Class<T> clazz,String instrumentId,long start,long end){
-		return mongoTemplate.find(new Query().addCriteria(Criteria.where("instrumentId").is(instrumentId).and("id").gt(start).lte(end)),clazz);
-	}
-	public <T extends OHLCDataItem> List<T> getList(Class<T> clazz,String instrumentId,long start,long end,int count){
-		return mongoTemplate.find(new Query().addCriteria(Criteria.where("instrumentId").is(instrumentId).and("id").gt(start).lte(end)).limit(count).with(new Sort(Sort.Direction.ASC, "id")), clazz);
-	}
-	public <T extends OHLCDataItem> List<T> getList(Class<T> clazz,String instrumentId,int count){
-		return mongoTemplate.find(new Query().addCriteria(Criteria.where("instrumentId").is(instrumentId)).limit(count).with(new Sort(Sort.Direction.ASC, "id")), clazz);
+		return mongoTemplate.find(new Query().addCriteria(Criteria.where("instrumentId").is(instrumentId).and("id").gte(start).lt(end)).with(new Sort(Sort.Direction.ASC, "id")),clazz);
 	}
 	public void setMongoTemplate(MongoTemplate mongoTemplate) {
 		this.mongoTemplate = mongoTemplate;
@@ -30,10 +24,6 @@ public class OHLCDataDaoImpl implements OHLCDataDao{
 	@Override
 	public void save(OHLCDataItem data) {
 		this.mongoTemplate.save(data);
-	}
-	@Override
-	public <T> int getBarLength(Class<T> clazz, String instrumentID, long time) {
-		return mongoTemplate.find(new Query().addCriteria(Criteria.where("instrumentId").is(instrumentID).and("id").lt(time)).with(new Sort(Sort.Direction.ASC, "id")), clazz).size();
 	}
 	@Override
 	public <T extends OHLCDataItem> T findOne(Class<T> clazz, String instrumentId, long id) {
@@ -59,10 +49,18 @@ public class OHLCDataDaoImpl implements OHLCDataDao{
 		}
 		return null;
 	}
+	
+	/**
+	 * 获取最新的K线数据
+	 * @param clazz
+	 * @param instrumentId
+	 * @param count
+	 * @return
+	 * @author meixinbin 2016-7-11 下午2:29:06
+	 */
 	@Override
 	public <T extends OHLCDataItem> List<T> getLatestList(Class<T> clazz, String instrumentId, int count) {
 		return mongoTemplate.find(new Query().addCriteria(Criteria.where("instrumentId").is(instrumentId)).limit(count).with(new Sort(Sort.Direction.DESC, "id")), clazz);
 	}
 	
-
 }

@@ -35,7 +35,6 @@ public class My018SelIndicator<T extends OHLCDataItem> extends CachedIndicator<B
 		if(index==0){
 			return false;
 		}
-		Tick tk0 = this.getTimeSeries().getTick(index-1);
 		Tick tk = this.getTimeSeries().getTick(index);
         long begin = tk.getBeginTime().getMillis();
         Calendar cal = Calendar.getInstance();

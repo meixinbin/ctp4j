@@ -32,12 +32,87 @@ public class OHLCDataServiceImpl implements OHLCDataService{
 	private Core core = new Core();
 	
 	@Override
+	public void save(OHLCDataItem data) {
+		this.oHLCDataDao.save(data);
+	}
+
+	
+	/**
+	 * 添加最新单位K线数据
+	 * @param data
+	 * @author meixinbin 2016-7-11 下午2:40:45
+	 */
+	@Override
 	public void addOHLCData(MarketData data) {
-		OHLCData1Minute ohlcData = (OHLCData1Minute) this.getLastOHLCData(data.getInstrumentID(), data.getId(), 60000);
+		OHLCData1Minute ohlcData = (OHLCData1Minute) this.getOHLCData(data.getInstrumentID(), data.getId());
 		if(ohlcData!=null){
 			this.oHLCDataDao.save(ohlcData);
 		}
 	}
+	
+	private OHLCDataItem getOHLCData(String instrumentId,long now) {
+		long[] tp = TimeDateUtils.timePeriod(now, 60000);
+		List<MarketData> ls = this.marketDataDao.getList(instrumentId, tp[0], tp[1]);
+		if(ls!=null && ls.size()>0){
+			OHLCData1Minute item = new OHLCData1Minute();
+			item.setId(tp[0]);
+			item.setInstrumentId(instrumentId);
+			item.setDateTimeStr(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss:SSS").format(new Date(tp[0])));
+			item.setEndTime(tp[1]);
+			int len = ls.size();
+			if(len==1){
+				MarketData md = ls.get(0);
+				if(md!=null){
+					item.setOpenPrice(md.getLastPrice());
+					item.setHighPrice(md.getLastPrice());
+					item.setLowPrice(md.getLastPrice());
+					item.setVolume(0d);
+					item.setClosePrice(md.getLastPrice());
+					item.setOpenInterest(md.getOpenInterest());
+					return item;
+				}
+				return null;
+			}
+			double [] prices = new double[len];
+			MInteger outBegIdx = new MInteger();
+			MInteger outNBElement = new MInteger();
+			MInteger outBegIdx2 = new MInteger();
+			MInteger outNBElement2 = new MInteger();
+			for(int i=0;i<len;i++){
+				prices[i]=ls.get(i).getLastPrice();
+			}
+			//最高价
+			double[] highestPriceOutReal = new double[1];
+			
+			//最低价
+			double[] lowestPriceOutReal = new double[1];
+			item.setId(tp[0]);
+			item.setOpenPrice(prices[0]);
+			item.setClosePrice(prices[prices.length-1]);
+			item.setVolume(Double.valueOf(ls.get(len-1).getVolume()-ls.get(0).getVolume()));
+			//最高价
+			RetCode rc= core.max(0, len-1, prices, len, outBegIdx, outNBElement, highestPriceOutReal);
+			if(RetCode.Success==rc){
+				item.setHighPrice(highestPriceOutReal[0]);
+			}else{
+				System.out.println(rc);
+				return null;
+			}
+			//最低价
+			RetCode lowestRc= core.min(0, len-1, prices, len, outBegIdx2, outNBElement2, lowestPriceOutReal);
+			if(RetCode.Success == lowestRc){
+				item.setLowPrice(lowestPriceOutReal[0]);
+			}else{
+				System.out.println(lowestRc);
+				return null;
+			}
+			return item;
+		}else{
+			System.out.println("no data");
+		}
+		return null;
+	}
+	
 	public void addAllOHLCData(MarketData md){
 		//判断时间是否有效
 		long id = md.getId();
@@ -69,83 +144,26 @@ public class OHLCDataServiceImpl implements OHLCDataService{
 			this.addOHLCData(md);
 			this.marketDataDao.save(md);
 	        this.addOHLCData(md);
-	        this.add(OHLCData5Minute.class, md.getInstrumentID(), md.getId());
-	        this.add(OHLCData10Minute.class, md.getInstrumentID(), md.getId());
-	        this.add(OHLCData15Minute.class, md.getInstrumentID(), md.getId());
-	        this.add(OHLCData30Minute.class, md.getInstrumentID(), md.getId());
-	        this.add(OHLCData1Hour.class, md.getInstrumentID(), md.getId());
+	        this.addOHLCData(OHLCData5Minute.class, md.getInstrumentID(), md.getId());
+	        this.addOHLCData(OHLCData10Minute.class, md.getInstrumentID(), md.getId());
+	        this.addOHLCData(OHLCData15Minute.class, md.getInstrumentID(), md.getId());
+	        this.addOHLCData(OHLCData30Minute.class, md.getInstrumentID(), md.getId());
+	        this.addOHLCData(OHLCData1Hour.class, md.getInstrumentID(), md.getId());
 //		        this.oHLCDataService.add(OHLCData2Hour.class, md.getInstrumentID(), md.getId());
-	        this.add(OHLCData1Day.class, md.getInstrumentID(), md.getId());
+	        this.addOHLCData(OHLCData1Day.class, md.getInstrumentID(), md.getId());
 		}
 		
 		
 	}
-	@Override
-	public OHLCDataItem getLastOHLCData(String instrumentId,long now,int timePeriod) {
-		long[] tp = TimeDateUtils.timePeriod(now, timePeriod);
-		List<MarketData> ls = this.marketDataDao.getList(instrumentId, tp[0], tp[1]);
-		if(ls!=null && ls.size()>0){
-			OHLCData1Minute item = new OHLCData1Minute();
-			item.setInstrumentId(instrumentId);
-			item.setDateTimeStr(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss:SSS").format(new Date(tp[1])));
-			int len = ls.size();
-			if(len==1){
-				MarketData md = ls.get(0);
-				if(md!=null){
-					item.setId(tp[1]);
-					item.setOpenPrice(md.getLastPrice());
-					item.setHighPrice(md.getLastPrice());
-					item.setLowPrice(md.getLastPrice());
-					item.setVolume(0d);
-					item.setClosePrice(md.getLastPrice());
-					item.setOpenInterest(md.getOpenInterest());
-					return item;
-				}
-				return null;
-			}
-			double [] prices = new double[len];
-			MInteger outBegIdx = new MInteger();
-			MInteger outNBElement = new MInteger();
-			MInteger outBegIdx2 = new MInteger();
-			MInteger outNBElement2 = new MInteger();
-			for(int i=0;i<len;i++){
-				prices[i]=ls.get(i).getLastPrice();
-			}
-			//最高价
-			double[] highestPriceOutReal = new double[1];
-			
-			//最低价
-			double[] lowestPriceOutReal = new double[1];
-			item.setId(tp[1]);
-			item.setOpenPrice(prices[0]);
-			item.setClosePrice(prices[prices.length-1]);
-			item.setVolume(Double.valueOf(ls.get(len-1).getVolume()-ls.get(0).getVolume()));
-			//最高价
-			RetCode rc= core.max(0, len-1, prices, len, outBegIdx, outNBElement, highestPriceOutReal);
-			if(RetCode.Success==rc){
-				item.setHighPrice(highestPriceOutReal[0]);
-			}else{
-				System.out.println(rc);
-				return null;
-			}
-			//最低价
-			RetCode lowestRc= core.min(0, len-1, prices, len, outBegIdx2, outNBElement2, lowestPriceOutReal);
-			if(RetCode.Success == lowestRc){
-				item.setLowPrice(lowestPriceOutReal[0]);
-			}else{
-				System.out.println(lowestRc);
-				return null;
-			}
-			return item;
-		}else{
-			System.out.println("no data");
-		}
-		return null;
-	}
-	@Override
-	public <T extends OHLCDataItem> List<T> getList(Class<T> clazz, String instrumentId, int count) {
-		return this.oHLCDataDao.getList(clazz, instrumentId, count);
-	}
+	
+	/**
+	 * 获取最新的K线数据
+	 * @param clazz
+	 * @param instrumentId
+	 * @param count
+	 * @return
+	 * @author meixinbin 2016-7-11 下午2:29:06
+	 */
 	@Override
 	public <T extends OHLCDataItem> List<T> getLatestList(Class<T> clazz, String instrumentId, int count) {
 		List<T> ls = this.oHLCDataDao.getLatestList(clazz, instrumentId, count);
@@ -161,7 +179,6 @@ public class OHLCDataServiceImpl implements OHLCDataService{
 			e.printStackTrace();
 		}
 		long[] tp = item.timePeriod(now);
-		item.setDateTimeStr(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss:SSS").format(new Date(tp[1])));
 		List<? extends OHLCDataItem> ls = this.oHLCDataDao.getList(item.getSubClass(), instrumentId, tp[0], tp[1]);
 		if(ls!=null && ls.size()>0){
 			int len = ls.size();
@@ -173,6 +190,7 @@ public class OHLCDataServiceImpl implements OHLCDataService{
 					e.printStackTrace();
 				}
 			}
+			item.setDateTimeStr(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss:SSS").format(new Date(tp[0])));
 			double [] prices = new double[len];
 			MInteger outBegIdx = new MInteger();
 			MInteger outNBElement = new MInteger();
@@ -188,7 +206,8 @@ public class OHLCDataServiceImpl implements OHLCDataService{
 			//最低价
 			double[] lowestPriceOutReal = new double[1];
 			
-			item.setId(tp[1]);
+			item.setId(tp[0]);
+			item.setEndTime(tp[1]);
 			item.setOpenPrice(prices[0]);
 			item.setClosePrice(prices[prices.length-1]);
 			//最高价
@@ -222,51 +241,20 @@ public class OHLCDataServiceImpl implements OHLCDataService{
 	}
 	
 	@Override
-	public <T extends OHLCDataItem> void  add(Class<T> clazz,String instrumentId,long now) {
+	public <T extends OHLCDataItem> void  addOHLCData(Class<T> clazz,String instrumentId,long now) {
 		OHLCDataItem item= this.getLastOHCLData(clazz,instrumentId,now);
 		if(item!=null){
 			this.oHLCDataDao.save(item);
 		}
 	}
 
-	public void setoHLCDataDao(OHLCDataDao oHLCDataDao) {
-		this.oHLCDataDao = oHLCDataDao;
-	}
-
 	public void setMarketDataDao(MarketDataDao marketDataDao) {
 		this.marketDataDao = marketDataDao;
-	}
-	
-	public static void main(String[] args) {
-		Core c = new Core();
-		double[] prices = new double[2];
-		prices[0]=2090.0;
-		prices[1]=2091.0;
-		MInteger outBegIdx = new MInteger();
-		MInteger outNBElement = new MInteger();
-		double[] highestPriceOutReal = new double[1];
-		RetCode rc = c.max(0, prices.length-1, prices, prices.length, outBegIdx, outNBElement, highestPriceOutReal);
-		if(RetCode.Success==rc){
-			System.out.println(highestPriceOutReal[0]);
-		}else{
-			System.out.println(rc);
-		}
-		
 	}
 
 	@Override
 	public <T extends OHLCDataItem> List<T> getList(Class<T> clazz, String instrumentId, long start, long end) {
 		return this.oHLCDataDao.getList(clazz, instrumentId, start, end);
-	}
-
-	@Override
-	public <T extends OHLCDataItem> List<T> getList(Class<T> clazz, String instrumentId, long start, long end, int count) {
-		return this.oHLCDataDao.getList(clazz, instrumentId, start, end,count);
-	}
-
-	@Override
-	public void save(OHLCDataItem data) {
-		this.oHLCDataDao.save(data);
 	}
 	@Override
 	public OHLCDataItem getYdOHLCData(String instrumentId) {
@@ -299,6 +287,10 @@ public class OHLCDataServiceImpl implements OHLCDataService{
 	@Override
 	public OHLCData1Day getYdData(String instrumentId, long id) {
 		return this.oHLCDataDao.getYdData(instrumentId, id);
+	}
+
+	public void setoHLCDataDao(OHLCDataDao oHLCDataDao) {
+		this.oHLCDataDao = oHLCDataDao;
 	}
 
 }

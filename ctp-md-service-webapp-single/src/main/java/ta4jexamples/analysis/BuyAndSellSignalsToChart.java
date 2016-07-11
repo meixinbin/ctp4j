@@ -125,7 +125,7 @@ public class BuyAndSellSignalsToChart {
     	TimeSeries series=new TimeSeries("rb1610",Period.days(1));
 		//
 		OHLCDataService oHLCDataService = (OHLCDataService) SpringUtil.getBean("oHLCDataService");
-		List<OHLCData1Day> ls = oHLCDataService.getList(OHLCData1Day.class, "rb1610", 5000);
+		List<OHLCData1Day> ls = oHLCDataService.getLatestList(OHLCData1Day.class, "rb1610", 5000);
 		for(OHLCData1Day o:ls){
 			series.addTick(new Tick(new DateTime(o.getId()), Decimal.valueOf(o.getOpenPrice()), Decimal.valueOf(o.getHighPrice()), Decimal.valueOf(o.getLowPrice()), Decimal.valueOf(o.getClosePrice()),Decimal.valueOf(o.getVolume())));
 		}

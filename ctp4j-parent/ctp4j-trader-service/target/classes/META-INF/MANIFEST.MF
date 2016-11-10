@@ -1,0 +1,29 @@
+Manifest-Version: 1.0
+Class-Path: lib/hibernate-validator-5.2.4.Final.jar lib/validation-api
+ -1.1.0.Final.jar lib/jboss-logging-3.2.1.Final.jar lib/classmate-1.1.
+ 0.jar lib/slf4j-api-1.7.21.jar lib/javassist-3.20.0-GA.jar lib/quartz
+ -2.2.3.jar lib/c3p0-0.9.1.1.jar lib/ta4j-0.8.jar lib/joda-time-2.3.ja
+ r lib/ctp-sequence-service-api-0.0.1-SNAPSHOT.jar lib/ctp-common-0.0.
+ 1-SNAPSHOT.jar lib/commons-lang-2.6.jar lib/ta-lib-0.4.0.jar lib/comm
+ ons-beanutils-1.9.2.jar lib/commons-collections-3.2.1.jar lib/spring-
+ data-mongodb-1.9.1.RELEASE.jar lib/spring-tx-4.2.5.RELEASE.jar lib/sp
+ ring-context-4.2.4.RELEASE.jar lib/spring-beans-4.2.4.RELEASE.jar lib
+ /spring-core-4.2.5.RELEASE.jar lib/spring-expression-4.2.5.RELEASE.ja
+ r lib/spring-data-commons-1.12.1.RELEASE.jar lib/mongo-java-driver-2.
+ 14.0.jar lib/jcl-over-slf4j-1.7.19.jar lib/zkclient-0.1.jar lib/zooke
+ eper-3.3.3.jar lib/jline-0.9.94.jar lib/ctp4j-md-service-api-0.0.1-SN
+ APSHOT.jar lib/ctp4j-common-0.0.1-SNAPSHOT.jar lib/ctp4j-trader-servi
+ ce-api-0.0.1-SNAPSHOT.jar lib/aspectjweaver-1.8.8.jar lib/spring-aop-
+ 4.2.4.RELEASE.jar lib/aopalliance-1.0.jar lib/spring-session-1.1.0.RE
+ LEASE.jar lib/log4j-1.2.17.jar lib/dubbo-2.8.4.jar lib/netty-3.7.0.Fi
+ nal.jar lib/javax.servlet-api-3.1.0.jar lib/httpclient-4.2.1.jar lib/
+ httpcore-4.2.1.jar lib/commons-logging-1.1.1.jar lib/commons-codec-1.
+ 6.jar lib/commons-pool-1.6.jar lib/curator-framework-2.5.0.jar lib/cu
+ rator-client-2.5.0.jar lib/guava-16.0.1.jar lib/jedis-2.6.2.jar lib/c
+ ommons-pool2-2.0.jar lib/spring-data-redis-1.6.0.RELEASE.jar lib/java
+ x.el-api-2.2.4.jar lib/ta-lib-0.4.0.jar
+Build-Jdk: 1.6.0_43
+Built-By: meixinbin
+Created-By: Maven Integration for Eclipse
+Main-Class: com.itqy8.framework.startup.Bootstrap
+
